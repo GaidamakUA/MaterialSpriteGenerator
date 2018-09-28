@@ -1,6 +1,8 @@
 # MaterialSpriteGenerator
 RPG game pixel art character sprite generator with user friendly material UI.
 
+https://gaidamakua.github.io/MaterialSpriteGenerator/
+
 ## Copying
 ### Arts
 Currently all arts are dual licensed under both GNU GPL 3.0 and CC-BY-SA 3.0.
