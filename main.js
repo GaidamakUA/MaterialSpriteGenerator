@@ -1,45 +1,32 @@
-$(document).ready(function() {
-  var canvas = $("#spritesheet").get(0);
-  var ctx = canvas.getContext("2d");
+var ctx;
 
-  function redraw() {
+function setup() {
+  var canvas = document.getElementById('spritesheet');
+  ctx = canvas.getContext('2d');
+
+  var femaleButton = document.getElementById('female')
+  femaleButton.onclick = function() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    var image = getImage("body_male.png")
+    drawImage('body_female.png');
+    femaleButton.className = "btn btn-primary"
+    maleButton.className = "btn btn-outline-primary"
+  }
+  var maleButton = document.getElementById('male')
+  maleButton.onclick = function() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawImage('body_male.png');
+    maleButton.className = "btn btn-primary"
+    femaleButton.className = "btn btn-outline-primary"
+  }
+
+  drawImage('body_male.png');
+}
+window.onload = setup;
+
+function drawImage(url) {
+  var image = new Image();
+  image.onload = function() {
     ctx.drawImage(image, 0, 0);
-  }
-
-  redraw();
-
-  var images = {};
-
-  function getImage(imgRef) {
-    if (images[imgRef])
-      return images[imgRef];
-    else {
-
-      // Load image if not in cache
-      var img = new Image();
-      img.src = "Universal-LPC-spritesheet/" + imgRef;
-      img.onload = redraw;
-      images[imgRef] = img;
-      return img;
-    }
-  }
-
-  function getImage2(imgRef, callback) {
-    if (images[imgRef]) {
-      callback(images[imgRef]);
-      return images[imgRef];
-    } else {
-
-      // Load image if not in cache
-      var img = new Image();
-      img.src = "Universal-LPC-spritesheet/" + imgRef;
-      img.onload = function() {
-        callback(img)
-      };
-      images[imgRef] = img;
-      return img;
-    }
-  }
-});
+  };
+  image.src = url;
+}
