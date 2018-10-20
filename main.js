@@ -1,16 +1,69 @@
-var SexEnum = Object.freeze({
-  "female": 0,
-  "male": 1
+const SexEnum = Object.freeze({
+  FEMALE: "female",
+  MALE: "male"
 });
-var RaceEnum = Object.freeze({
-  "human": 0,
-  "orc": 1,
-  "skeleton": 2
+const RaceEnum = Object.freeze({
+  HUMAN: "human",
+  ORC: "orc",
+  SKELETON: "skeleton"
 })
 
-let RACE_STATE = RaceEnum.human;
+let SELECTED_SEX = SexEnum.MALE;
+const DEFAULT_RACE = RaceEnum.HUMAN;
 
-var SEX_STATE = SexEnum.male;
+let SELECTED_RACE = RaceEnum.HUMAN;
+
+function setSelectedSex(sex) {
+  $('#female')[0].className = "btn btn-outline-primary";
+  $('#male')[0].className = "btn btn-outline-primary";
+  $(`#${sex}`).addClass('btn-primary').removeClass('btn-outline-primary');
+  SELECTED_SEX = sex;
+  syncUi();
+}
+
+function setSelectedRace(race) {
+  SELECTED_RACE = race;
+  syncUi();
+}
+
+class RaceComponent {
+  constructor(raceEnum, allowedSexes) {
+    this.race = raceEnum;
+    this.allowedSexes = allowedSexes;
+    this.button = $(`#${this.race}`)[0]
+    console.log(this)
+  }
+
+  syncUi() {
+    let satisfyConstraints = this.allowedSexes.includes(SELECTED_SEX);
+    let isSelected = SELECTED_RACE === this.race
+    this.button.disabled = !satisfyConstraints;
+    this.button.className = isSelected && satisfyConstraints ? "btn btn-primary" : "btn btn-outline-primary";
+    if (isSelected && !satisfyConstraints) {
+      SELECTED_RACE = DEFAULT_RACE;
+      syncUi();
+    }
+  };
+}
+
+let raceUiComponents
+
+function createRaceUi() {
+  raceUiComponents = [
+    new RaceComponent(RaceEnum.HUMAN, [SexEnum.MALE, SexEnum.FEMALE]),
+    new RaceComponent(RaceEnum.ORC, [SexEnum.MALE, SexEnum.FEMALE]),
+    new RaceComponent(RaceEnum.SKELETON, [SexEnum.MALE])
+  ]
+}
+
+function syncUi() {
+  painter.clear();
+  raceUiComponents.forEach(function(component) {
+    component.syncUi()
+  })
+  let pictureName = `${SELECTED_SEX}_${SELECTED_RACE}.png`;
+  painter.drawImage(pictureName);
+}
 
 function setup() {
   var canvas = document.getElementById('spritesheet');
@@ -31,63 +84,7 @@ function setup() {
     }
   }
 
-  initSexSwitch(painter)
-
   painter.drawImage('male_human.png');
+  createRaceUi()
 }
 window.onload = setup;
-
-function initSexSwitch(painter) {
-  var femaleConfig = {
-    button: document.getElementById('female'),
-    image: 'human_female.png',
-    state: SexEnum.female
-  }
-  var maleConfig = {
-    button: document.getElementById('male'),
-    image: 'human_male.png',
-    state: SexEnum.male
-  }
-}
-
-function switchSex(sex) {
-  painter.clear();
-  $('#female')[0].className = "btn btn-outline-primary";
-  $('#male')[0].className = "btn btn-outline-primary";
-  $(`#${sex}`).addClass('btn-primary').removeClass('btn-outline-primary');
-  switch (sex) {
-    case 'male':
-      painter.drawImage('male_human.png');
-      SEX_STATE = SexEnum.male;
-      break;
-    case 'female':
-      painter.drawImage('female_human.png');
-      SEX_STATE = SexEnum.female;
-      break;
-  }
-}
-
-function switchRace(race) {
-  console.log('switch to race', race);
-  painter.clear();
-  $('#human')[0].className = "btn btn-outline-primary";
-  $('#orc')[0].className = "btn btn-outline-primary";
-  $('#skeleton')[0].className = "btn btn-outline-primary";
-  $(`#${race}`).addClass('btn-primary').removeClass('btn-outline-primary');
-  let currentSexValue = Object.keys(SexEnum).filter(sex => SexEnum[sex] === SEX_STATE)[0];
-  let pictureName = `${currentSexValue}_${race}.png`;
-  switch (race) {
-    case 'human':
-        RACE_STATE = RaceEnum.human;
-        break;
-    case 'orc':
-        RACE_STATE = RaceEnum.orc;
-        break;
-    case 'skeleton':
-        RACE_STATE = RaceEnum.skeleton;
-        pictureName = `male_${race}.png`;
-        break;
-  }
-  painter.drawImage(pictureName);
-
-}
